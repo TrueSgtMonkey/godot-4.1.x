@@ -1,5 +1,7 @@
 /* register_types.h */
 
-void register_ammo_types();
-void unregister_ammo_types();
+#include "modules/register_module_types.h"
+
+void initialize_ammo_module(ModuleInitializationLevel p_level);
+void uninitialize_ammo_module(ModuleInitializationLevel p_level);
 /* yes, the word in the middle must be the same as the module folder name */

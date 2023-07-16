@@ -1,16 +1,14 @@
 #ifndef AI_CLASS_H
 #define AI_CLASS_H
 
-#include "scene/3d/physics_body.h"
-#include "core/dictionary.h"
-#include "scene/resources/world.h"
 #include "scene/3d/sprite_3d.h"
-#include "modules/spriteRotater/sprite_rotater.h"
-#include "modules/anitimer/AniTimer.h"
+#include "scene/3d/physics_body_3d.h"
+#include "modules/sprite_rotater/sprite_rotater.h"
+#include "modules/ani_timer/ani_timer.h"
 
-class AI : public KinematicBody
+class AI : public CharacterBody3D
 {
-	GDCLASS(AI, KinematicBody);
+	GDCLASS(AI, CharacterBody3D);
 
 	//private variables
 	SpriteRotater rotater;
@@ -45,28 +43,28 @@ class AI : public KinematicBody
 		bool checkForPlayer3D(const Dictionary& result, Object* p_dir_timer);
 		bool checkForPlayer(Object* p_sprite, const Dictionary& result, Object* p_dir_timer, Object* p_ani_timer);
 		bool lookForPlayer(const Dictionary& result);
-		Dictionary rayShot(const Vector3& vec1, const Vector3& vec2, const Vector<RID>& vecExclude = Vector<RID>());
+		Dictionary rayShot(const Vector3& vec1, const Vector3& vec2, const Array& vecExclude = Array());
 		void setHorizontalVelocity(const Vector3& vel);
         Dictionary followScentTrail(const Array& vec3s);
 
 		//getters and setters
 		void setVelocity(const Vector3& vec);
 		Vector3 getVelocity();
-		void setRow(int row);
+		void setRow(int newRow);
 		int getRow();
-		void setSpriteAngle(int spriteAngle);
+		void setSpriteAngle(int newSpriteAngle);
 		int getSpriteAngle();
-		void setRandDistribution(int rd);
+		void setRandDistribution(int newRd);
 		int getRandDistribution();
-		void setRandChance(int rc);
+		void setRandChance(int newRc);
 		int getRandChance();
-		void setStartIdle(bool startIdle);
+		void setStartIdle(bool isStartIdle);
 		bool getStartIdle();
-		void setWalking(bool walking);
+		void setWalking(bool isWalking);
 		bool getWalking();
-		void setSightDist(float sightDist);
+		void setSightDist(float newSightDist);
 		float getSightDist();
-		void setSpeed(float speed);
+		void setSpeed(float customSpeed);
 		float getSpeed();
 		void setPlayerGroup(String group);
 		String getPlayerGroup();
@@ -74,12 +72,12 @@ class AI : public KinematicBody
 		String getScentGroup();
 		SpriteRotater* getRotater();
 		float getYRotation();
-		void setYRotation(float yRotation);
-		void setIdTarget(const Array& id_target);
+		void setYRotation(float newYRotation);
+		void setIdTarget(const Array& idTarget);
 		Array getIdTarget();
-		void setTargetSignal(const Array& target_signal);
+		void setTargetSignal(const Array& targetSignal);
 		Array getTargetSignal();
-		void setDictChanges(const Array& dictChanges);
+		void setDictChanges(const Array& newDictChanges);
 		Array getDictChanges();
 };
 

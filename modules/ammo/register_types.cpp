@@ -2,13 +2,19 @@
 
 #include "register_types.h"
 
-#include "core/class_db.h"
-#include "Ammo.h"
+#include "core/object/class_db.h"
+#include "ammo.h"
 
-void register_ammo_types() {
+void initialize_ammo_module(ModuleInitializationLevel p_level) {
+    if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
+            return;
+    }
     ClassDB::register_class<Ammo>();
 }
 
-void unregister_ammo_types() {
+void uninitialize_ammo_module(ModuleInitializationLevel p_level) {
+    if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
+            return;
+    }
    // Nothing to do here in this example.
 }

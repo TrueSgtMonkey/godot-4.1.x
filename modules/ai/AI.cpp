@@ -1,4 +1,8 @@
-#include "AI.h"
+#include "ai.h"
+#include "scene/3d/physics_body_3d.h"
+#include "core/variant/dictionary.h"
+#include "scene/resources/world_3d.h"
+#include "scene/3d/node_3d.h"
 
 /* PUBLIC METHODS */
 
@@ -88,7 +92,7 @@ bool AI::lookForPlayer(const Dictionary& result)
 	// if startIdle starts off as true, then enemy will not check for the player
 	if (!startIdle && result.size() > 0)
 	{
-		Spatial* spatial = Object::cast_to<Spatial>(result["collider"]);
+		Node3D* spatial = Object::cast_to<Node3D>(result["collider"]);
 		if (spatial != NULL && spatial->is_in_group(playerGroup))
 		{
 			// getting the distance and then perform dot product (AP needed for both)
@@ -104,22 +108,25 @@ bool AI::lookForPlayer(const Dictionary& result)
 	return false;
 }
 
-Dictionary AI::rayShot(const Vector3& vec1, const Vector3& vec2, const Vector<RID>& vecExclude)
+Dictionary AI::rayShot(const Vector3& vec1, const Vector3& vec2, const Array& vecExclude)
 {
 	//getting the space state of the world
-	PhysicsDirectSpaceState* space_state = get_world()->get_direct_space_state();
+	PhysicsDirectSpaceState3D* space_state = get_world_3d()->get_direct_space_state();
 	//used for the dictionary that is returned
-	PhysicsDirectSpaceState::RayResult inters;
+	PhysicsDirectSpaceState3D::RayResult inters;
+	PhysicsDirectSpaceState3D::RayParameters params;
 
 	//will not be included in the intersect_ray result
-	Set<RID> exclude;
 	for (int i = 0; i < vecExclude.size(); i++)
 	{
-		exclude.insert(vecExclude[i]);
+		params.exclude.insert(vecExclude[i]);
 	}
 
+	params.from = vec1;
+	params.to = vec2;
+
 	//returning empty dictionary if the ray does not collide with anything
-	if(!space_state->intersect_ray(vec1, vec2, inters, exclude))
+	if(!space_state->intersect_ray(params, inters))
 	{
 		return Dictionary();
 	}
@@ -150,7 +157,7 @@ Dictionary AI::followScentTrail(const Array& vec3s)
 		Dictionary scentResult = rayShot(get_global_transform().origin, vec3s[i]);
 		if (scentResult.size() > 0)
 		{
-			Spatial* scent = Object::cast_to<Spatial>(scentResult["collider"]);
+			Node3D* scent = Object::cast_to<Node3D>(scentResult["collider"]);
 			if (scent != NULL && scent->is_in_group(scentGroup))
 			{
 				return scentResult;
@@ -168,19 +175,19 @@ void AI::setVelocity(const Vector3& vec)
 }
 
 Vector3 AI::getVelocity() { return velocity; }
-void AI::setRow(int row) { this->row = row; }
+void AI::setRow(int newRow) { this->row = newRow; }
 int AI::getRow() { return row; }
-void AI::setRandDistribution(int rd) { this->rd = rd; }
+void AI::setRandDistribution(int newRd) { this->rd = newRd; }
 int AI::getRandDistribution() { return rd; }
-void AI::setRandChance(int rc) { this->rc = rc; }
+void AI::setRandChance(int newRc) { this->rc = newRc; }
 int AI::getRandChance() { return rc; }
-void AI::setStartIdle(bool startIdle) { this->startIdle = startIdle; }
+void AI::setStartIdle(bool isStartIdle) { this->startIdle = isStartIdle; }
 bool AI::getStartIdle() { return startIdle; }
-void AI::setWalking(bool walking) { this->walking = walking; }
+void AI::setWalking(bool isWalking) { this->walking = isWalking; }
 bool AI::getWalking() { return walking; }
-void AI::setSightDist(float sightDist) { this->sightDist = sightDist; }
+void AI::setSightDist(float newSightDist) { this->sightDist = newSightDist; }
 float AI::getSightDist() { return sightDist; }
-void AI::setSpeed(float speed) { this->speed = speed; }
+void AI::setSpeed(float customSpeed) { this->speed = customSpeed; }
 float AI::getSpeed() { return speed; }
 void AI::setPlayerGroup(String group) { playerGroup = group; }
 String AI::getPlayerGroup() { return playerGroup; }
@@ -188,30 +195,30 @@ void AI::setScentGroup(String group) { scentGroup = group; }
 String AI::getScentGroup() { return scentGroup; }
 SpriteRotater* AI::getRotater() { return &this->rotater; }
 float AI::getYRotation() { return yRotation; }
-void AI::setYRotation(float yRotation) { this->yRotation = yRotation; }
-void AI::setSpriteAngle(int spriteAngle) { this->spriteAngle = spriteAngle; }
+void AI::setYRotation(float newYRotation) { this->yRotation = newYRotation; }
+void AI::setSpriteAngle(int newSpriteAngle) { this->spriteAngle = newSpriteAngle; }
 int AI::getSpriteAngle() { return spriteAngle; }
 
-void AI::setIdTarget(const Array& id_target)
+void AI::setIdTarget(const Array& idTarget)
 {
 	this->id_target.~Array();
-	this->id_target = id_target;
+	this->id_target = idTarget;
 }
 
 Array AI::getIdTarget() { return id_target; }
 
-void AI::setTargetSignal(const Array& target_signal)
+void AI::setTargetSignal(const Array& targetSignal)
 {
 	this->target_signal.~Array();
-	this->target_signal = target_signal;
+	this->target_signal = targetSignal;
 }
 
 Array AI::getTargetSignal() { return target_signal; }
 
-void AI::setDictChanges(const Array& dictChanges)
+void AI::setDictChanges(const Array& newDictChanges)
 {
 	this->dictChanges.~Array();
-	this->dictChanges = dictChanges;
+	this->dictChanges = newDictChanges;
 }
 
 Array AI::getDictChanges() { return dictChanges; }
@@ -275,8 +282,8 @@ void AI::_bind_methods()
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "velocity"), "setVelocity", "getVelocity");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "rd"), "setRandDistribution", "getRandDistribution");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "rc"), "setRandChance", "getRandChance");
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "sightDist"), "setSightDist", "getSightDist");	
-	ADD_PROPERTY(PropertyInfo(Variant::REAL, "speed"), "setSpeed", "getSpeed");	
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "sightDist"), "setSightDist", "getSightDist");	
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "speed"), "setSpeed", "getSpeed");	
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "walking"), "setWalking", "getWalking");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "startIdle"), "setStartIdle", "getStartIdle");
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "playerGroup"), "setPlayerGroup", "getPlayerGroup");

@@ -3,16 +3,16 @@
 #include "register_types.h"
 
 #include "core/object/class_db.h"
-#include "ai.h"
+#include "ani_timer.h"
 
-void initialize_ai_module(ModuleInitializationLevel p_level) {
+void initialize_ani_timer_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
             return;
     }
-    ClassDB::register_class<AI>();
+    ClassDB::register_class<AniTimer>();
 }
 
-void uninitialize_ai_module(ModuleInitializationLevel p_level) {
+void uninitialize_ani_timer_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
             return;
     }
